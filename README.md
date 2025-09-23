@@ -3,7 +3,6 @@
 [![GitHub Release Version](https://img.shields.io/github/v/release/cssnr/upload-release-action?logo=git&logoColor=white&labelColor=585858&label=%20)](https://github.com/cssnr/upload-release-action/releases/latest)
 [![GitHub Dist Size](https://img.shields.io/github/size/cssnr/upload-release-action/dist%2Findex.js?label=dist%20size)](https://github.com/cssnr/upload-release-action/blob/master/src/index.js)
 [![Workflow Release](https://img.shields.io/github/actions/workflow/status/cssnr/upload-release-action/release.yaml?logo=cachet&label=release)](https://github.com/cssnr/upload-release-action/actions/workflows/release.yaml)
-[![Workflow Test](https://img.shields.io/github/actions/workflow/status/cssnr/upload-release-action/test.yaml?logo=cachet&label=test)](https://github.com/cssnr/upload-release-action/actions/workflows/test.yaml)
 [![Workflow Lint](https://img.shields.io/github/actions/workflow/status/cssnr/upload-release-action/lint.yaml?logo=cachet&label=lint)](https://github.com/cssnr/upload-release-action/actions/workflows/lint.yaml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cssnr_upload-release-action&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=cssnr_upload-release-action)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/cssnr/upload-release-action?logo=github&label=updated)](https://github.com/cssnr/upload-release-action/pulse)
