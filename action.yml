@@ -42,7 +42,6 @@ outputs:
   assets:
     description: "Assets Uploaded"
 
-# https://www.schemastore.org/github-action.json
 runs:
   using: "node24"
   main: "dist/index.js"
