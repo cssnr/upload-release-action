@@ -11,7 +11,7 @@
       }
     },
     {
-      "files": ["**/*.js", "**/*.css", "**/*.scss"],
+      "files": ["**/*.js", "**/*.mjs", "**/*.css", "**/*.scss"],
       "options": {
         "tabWidth": 4
       }
