@@ -7,7 +7,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cssnr_upload-release-action&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=cssnr_upload-release-action)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/cssnr/upload-release-action?logo=github&label=updated)](https://github.com/cssnr/upload-release-action/pulse)
 [![Codeberg Last Commit](https://img.shields.io/gitea/last-commit/cssnr/upload-release-action/master?gitea_url=https%3A%2F%2Fcodeberg.org%2F&logo=codeberg&logoColor=white&label=updated)](https://codeberg.org/cssnr/upload-release-action)
-[![GitHub Contributors](https://img.shields.io/github/contributors/cssnr/upload-release-action?logo=github)](https://github.com/cssnr/upload-release-action/graphs/contributors)
+[![GitHub Contributors](https://img.shields.io/github/contributors-anon/cssnr/upload-release-action?logo=github)](https://github.com/cssnr/upload-release-action/graphs/contributors)
 [![GitHub Repo Size](https://img.shields.io/github/repo-size/cssnr/upload-release-action?logo=bookstack&logoColor=white&label=repo%20size)](https://github.com/cssnr/upload-release-action?tab=readme-ov-file#readme)
 [![GitHub Top Language](https://img.shields.io/github/languages/top/cssnr/upload-release-action?logo=htmx)](https://github.com/cssnr/upload-release-action)
 [![GitHub Discussions](https://img.shields.io/github/discussions/cssnr/upload-release-action?logo=github)](https://github.com/cssnr/upload-release-action/discussions)
@@ -74,7 +74,7 @@ This action requires the following permissions:
 
 ```yaml
 permissions:
-  contents: write
+  issues: write
 ```
 
 Permissions documentation for [Workflows](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) and [Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication).
@@ -158,7 +158,7 @@ on:
     types: [published]
 
 permissions:
-  contents: write
+  issues: write
 
 jobs:
   release:
