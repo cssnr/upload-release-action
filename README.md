@@ -74,7 +74,7 @@ This action requires the following permissions:
 
 ```yaml
 permissions:
-  issues: write
+  contents: write
 ```
 
 Permissions documentation for [Workflows](https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/controlling-permissions-for-github_token) and [Actions](https://docs.github.com/en/actions/security-for-github-actions/security-guides/automatic-token-authentication).
@@ -158,7 +158,7 @@ on:
     types: [published]
 
 permissions:
-  issues: write
+  contents: write
 
 jobs:
   release:
