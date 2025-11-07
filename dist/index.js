@@ -32614,6 +32614,22 @@ module.exports = require("node:events");
 
 /***/ }),
 
+/***/ 3024:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
+
+/***/ }),
+
+/***/ 6760:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
+
+/***/ }),
+
 /***/ 7075:
 /***/ ((module) => {
 
@@ -34406,11 +34422,12 @@ module.exports = parseParams
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+const fs = __nccwpck_require__(3024)
+const path = __nccwpck_require__(6760)
+
 const core = __nccwpck_require__(7484)
 const github = __nccwpck_require__(3228)
 const glob = __nccwpck_require__(7206)
-const fs = __nccwpck_require__(9896)
-const path = __nccwpck_require__(6928)
 
 const Api = __nccwpck_require__(8793)
 

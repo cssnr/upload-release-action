@@ -1,8 +1,9 @@
+const fs = require('node:fs')
+const path = require('node:path')
+
 const core = require('@actions/core')
 const github = require('@actions/github')
 const glob = require('@actions/glob')
-const fs = require('fs')
-const path = require('path')
 
 const Api = require('./api')
 
