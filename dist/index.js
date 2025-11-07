@@ -34443,7 +34443,17 @@ async function main() {
     // core.endGroup() // Debug process.env
 
     // Inputs
-    const inputs = getInputs()
+    const inputs = {
+        globs: core.getInput('globs'),
+        files: core.getInput('files'),
+        names: core.getInput('names'),
+        overwrite: core.getBooleanInput('overwrite'),
+        id: core.getInput('id'),
+        tag: core.getInput('tag'),
+        latest: core.getBooleanInput('latest'),
+        summary: core.getBooleanInput('summary'),
+        token: core.getInput('token', { required: true }),
+    }
     core.startGroup('Inputs')
     console.log(inputs)
     core.endGroup() // Inputs
@@ -34598,34 +34608,6 @@ async function addSummary(inputs, files, results) {
     const link = 'https://github.com/cssnr/upload-release-action'
     core.summary.addRaw(`\n[${text}](${link}?tab=readme-ov-file#readme)\n\n---`)
     await core.summary.write()
-}
-
-/**
- * Get Inputs
- * @typedef {object} Inputs
- * @property {string|undefined} globs
- * @property {string|undefined} files
- * @property {string|undefined} names
- * @property {boolean} overwrite
- * @property {string|undefined} id
- * @property {string|undefined} tag
- * @property {boolean} latest
- * @property {boolean} summary
- * @property {string} token
- * @return {Inputs}
- */
-function getInputs() {
-    return {
-        globs: core.getInput('globs'),
-        files: core.getInput('files'),
-        names: core.getInput('names'),
-        overwrite: core.getBooleanInput('overwrite'),
-        id: core.getInput('id'),
-        tag: core.getInput('tag'),
-        latest: core.getBooleanInput('latest'),
-        summary: core.getBooleanInput('summary'),
-        token: core.getInput('token', { required: true }),
-    }
 }
 
 main().catch((e) => {
