@@ -34431,7 +34431,7 @@ const glob = __nccwpck_require__(7206)
 
 const Api = __nccwpck_require__(8793)
 
-async function main() {
+async function main() /* NOSONAR */ {
     core.info(`🏳️ Starting Upload Release Action`)
 
     // // Debug

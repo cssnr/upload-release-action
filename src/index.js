@@ -7,7 +7,7 @@ const glob = require('@actions/glob')
 
 const Api = require('./api')
 
-async function main() {
+async function main() /* NOSONAR */ {
     core.info(`🏳️ Starting Upload Release Action`)
 
     // // Debug
