@@ -1,5 +1,5 @@
 name: "Upload Release"
-description: "Upload Files or Globs as Release Assets with Custom Names."
+description: "Upload Files or Globs as Release Assets with Custom Names. Automatic Release Detection use Latest, or specify the ID or Tag."
 author: "Shane"
 branding:
   icon: "upload"
@@ -8,34 +8,25 @@ branding:
 inputs:
   globs:
     description: "File Glob(s)"
-    required: false
   files:
     description: "File Path(s)"
-    required: false
   names:
     description: "Asset File Name(s)"
-    required: false
   overwrite:
     description: "Overwrite Existing Files"
-    required: false
     default: "false"
   id:
     description: "Optional Release ID"
-    required: false
   tag:
     description: "Optional Release Tag"
-    required: false
   latest:
     description: "Use Latest Release"
-    required: false
     default: "false"
   summary:
     description: "Add Summary to Job"
-    required: false
     default: "true"
   token:
     description: "GitHub Access Token PAT"
-    required: false
     default: ${{ github.token }}
 
 outputs:

@@ -3,7 +3,7 @@ const github = require('@actions/github')
 class Api {
     /**
      * GitHub Api
-     * @param {String} token
+     * @param {string} token
      */
     constructor(token) {
         this.octokit = github.getOctokit(token)
@@ -12,7 +12,7 @@ class Api {
     /**
      * Get Release
      * @param {string} release_id
-     * @return {Promise<InstanceType<typeof github.GitHub>|Undefined>}
+     * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
      */
     async getRelease(release_id) {
         const release = await this.octokit.rest.repos.getRelease({
@@ -25,7 +25,7 @@ class Api {
     /**
      * Get Release by Tag
      * @param {string} tag
-     * @return {Promise<InstanceType<typeof github.GitHub>|Undefined>}
+     * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
      */
     async getReleaseByTag(tag) {
         const release = await this.octokit.rest.repos.getReleaseByTag({
@@ -37,7 +37,7 @@ class Api {
 
     /**
      * Get Latest Release
-     * @return {Promise<InstanceType<typeof github.GitHub>|Undefined>}
+     * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
      */
     async getLatestRelease() {
         const release = await this.octokit.rest.repos.getLatestRelease({
@@ -48,10 +48,10 @@ class Api {
 
     /**
      * Upload Release Asset
-     * @param {String} release_id
-     * @param {String} name
+     * @param {string} release_id
+     * @param {string} name
      * @param {Buffer} data
-     * @return {Promise<InstanceType<typeof github.GitHub>|Undefined>}
+     * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
      */
     async uploadReleaseAsset(release_id, name, data) {
         const release = await this.octokit.rest.repos.uploadReleaseAsset({
@@ -65,8 +65,8 @@ class Api {
 
     /**
      * Delete Release Asset
-     * @param {String} asset_id
-     * @return {Promise<InstanceType<typeof github.GitHub>|Undefined>}
+     * @param {string} asset_id
+     * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
      */
     async deleteReleaseAsset(asset_id) {
         const release = await this.octokit.rest.repos.deleteReleaseAsset({
