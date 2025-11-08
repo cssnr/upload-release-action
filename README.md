@@ -33,7 +33,7 @@ Upload Files or Globs as Release Assets with Custom Names.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     files: README.md
 ```
@@ -62,7 +62,7 @@ You must provide `files` or `globs` or both.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     files: README.md
 ```
@@ -89,7 +89,7 @@ Permissions documentation for [Workflows](https://docs.github.com/en/actions/wri
 ```yaml
 - name: 'Upload Release'
   id: release
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     files: README.md
 
@@ -106,7 +106,7 @@ With a file path.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     files: dist/app.js
 ```
@@ -115,7 +115,7 @@ With a glob.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     globs: dist/**
 ```
@@ -124,7 +124,7 @@ With multiple files or globs.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     globs: |
       dist/**
@@ -138,7 +138,7 @@ With File Names.
 
 ```yaml
 - name: 'Upload Release'
-  uses: cssnr/upload-release-action@v2
+  uses: cssnr/upload-release-action@v1
   with:
     files: |
       README.md
@@ -173,7 +173,7 @@ jobs:
 
       - name: 'Upload Release'
         id: release
-        uses: cssnr/upload-release-action@v2
+        uses: cssnr/upload-release-action@v1
         with:
           files: README.md
 
