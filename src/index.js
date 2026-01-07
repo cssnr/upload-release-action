@@ -78,7 +78,7 @@ async function main() /* NOSONAR */ {
     const results = []
 
     // Processing
-    core.startGroup('Processing')
+    core.info('Processing')
     for (const file of files) {
         let name
         if (names.length) {
@@ -87,25 +87,27 @@ async function main() /* NOSONAR */ {
         } else {
             name = path.basename(file)
         }
-        core.info(`-- Processing -- name: ${name} - file: ${file}`)
+        core.startGroup(`Processing: ${name}`)
+        core.info(`file: ${file}`)
         const asset = release.assets.find((obj) => obj.name === name)
         console.log(`asset.id:`, asset?.id)
         if (asset) {
+            console.log('⚠️ ASSET EXIST ⚠️')
             if (inputs.overwrite) {
-                console.log(`! ! ASSET EXIST ! ! DELETING:`, name)
+                console.log(`⛔ Deleting:`, name)
                 await api.deleteReleaseAsset(asset.id)
             } else {
-                console.log(`- - ASSET EXIST - - SKIPPING:`, name)
+                console.log(`▶️ Skipping:`, name)
                 continue
             }
         }
-        console.log(`+ + UPLOADING ASSET + + name:`, name)
+        console.log(`✅ Uploading:`, name)
         const data = fs.readFileSync(file)
         const result = await api.uploadReleaseAsset(release.id, name, data)
-        console.log(`result.id:`, result.id)
+        console.log(JSON.stringify(result, null, 2))
         results.push(result)
+        core.endGroup() // Processing
     }
-    core.endGroup() // Processing
 
     console.log(`results.length:`, results.length)
     if (!results.length) core.warning('No Assets Uploaded...')
