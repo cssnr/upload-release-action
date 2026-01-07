@@ -47,6 +47,7 @@ jobs:
           env
 
       - name: "1 - Local Test"
+        id: test
         uses: ./
         with:
           #tag: 0.5.18
@@ -60,7 +61,7 @@ jobs:
       - name: "Validate Outputs"
         uses: cssnr/validate-outputs-action@master
         with:
-          outputs: ${{ toJSON(steps.url.outputs) }}
+          outputs: ${{ toJSON(steps.test.outputs) }}
           data: |
             assets:
 
