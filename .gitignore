@@ -3,7 +3,6 @@
 *.iml
 .vscode/
 node_modules/
-.*cache/
 .*cache
 *.log
 eslint_report.json
