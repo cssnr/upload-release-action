@@ -1,133 +1,133 @@
-const fs = require('node:fs')
-const path = require('node:path')
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 
-const core = require('@actions/core')
-const github = require('@actions/github')
-const glob = require('@actions/glob')
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import * as glob from '@actions/glob'
 
-const Api = require('./api')
+import { Api } from './api.js'
 
 async function main() /* NOSONAR */ {
-    core.info(`🏳️ Starting Upload Release Action`)
+  core.info(`🏳️ Starting Upload Release Action`)
 
-    // // Debug
-    // core.startGroup('Debug: github.context')
-    // console.log(github.context)
-    // core.endGroup() // Debug github.context
-    // core.startGroup('Debug: process.env')
-    // console.log(process.env)
-    // core.endGroup() // Debug process.env
+  // // Debug
+  // core.startGroup('Debug: github.context')
+  // console.log(github.context)
+  // core.endGroup() // Debug github.context
+  // core.startGroup('Debug: process.env')
+  // console.log(process.env)
+  // core.endGroup() // Debug process.env
 
-    // Inputs
-    const inputs = {
-        globs: core.getInput('globs'),
-        files: core.getInput('files'),
-        names: core.getInput('names'),
-        overwrite: core.getBooleanInput('overwrite'),
-        id: core.getInput('id'),
-        tag: core.getInput('tag'),
-        latest: core.getBooleanInput('latest'),
-        summary: core.getBooleanInput('summary'),
-        token: core.getInput('token', { required: true }),
+  // Inputs
+  const inputs = {
+    globs: core.getInput('globs'),
+    files: core.getInput('files'),
+    names: core.getInput('names'),
+    overwrite: core.getBooleanInput('overwrite'),
+    id: core.getInput('id'),
+    tag: core.getInput('tag'),
+    latest: core.getBooleanInput('latest'),
+    summary: core.getBooleanInput('summary'),
+    token: core.getInput('token', { required: true }),
+  }
+  core.startGroup('Inputs')
+  console.log(inputs)
+  core.endGroup() // Inputs
+
+  // Files
+  const files = []
+  if (inputs.globs) {
+    console.log('inputs.globs:', inputs.globs)
+    const globber = await glob.create(inputs.globs, {
+      matchDirectories: false,
+    })
+    const globs = await globber.glob()
+    console.log('globs:', globs)
+    files.push(...globs)
+  }
+  if (inputs.files) {
+    console.log('inputs.files:', inputs.files)
+    files.push(...inputs.files.split('\n'))
+  }
+  console.log('files.length:', files.length)
+  console.log('files:', files)
+  if (!files?.length) return core.setFailed('No Files to Process...')
+
+  // Names
+  console.log('inputs.names:', inputs.names)
+  const names = inputs.names ? inputs.names.split('\n') : []
+  console.log('names.length:', names.length)
+  console.log('names:', names)
+  if (names.length && names.length !== files.length) {
+    return core.setFailed('File and Names Length Mismatch...')
+  }
+
+  // Variables
+  console.log('context.repo:', github.context.repo)
+  console.log('context.ref:', github.context.ref)
+  console.log('context.payload.release?.id:', github.context.payload.release?.id)
+  const api = new Api(inputs.token)
+
+  // Release
+  const release = await getRelease(inputs, api)
+  console.log('release?.id:', release?.id)
+  if (!release) return core.setFailed('No Release to Process...')
+  console.log('release.html_url:', release.html_url)
+  console.log('release.assets.length:', release.assets.length)
+
+  const results = []
+
+  // Processing
+  core.info('Processing')
+  for (const file of files) {
+    let name
+    if (names.length) {
+      const i = files.indexOf(file)
+      name = names[i]
+    } else {
+      name = path.basename(file)
     }
-    core.startGroup('Inputs')
-    console.log(inputs)
-    core.endGroup() // Inputs
-
-    // Files
-    const files = []
-    if (inputs.globs) {
-        console.log('inputs.globs:', inputs.globs)
-        const globber = await glob.create(inputs.globs, {
-            matchDirectories: false,
-        })
-        const globs = await globber.glob()
-        console.log('globs:', globs)
-        files.push(...globs)
+    core.startGroup(`Processing: ${name}`)
+    core.info(`file: ${file}`)
+    const asset = release.assets.find((obj) => obj.name === name)
+    console.log(`asset.id:`, asset?.id)
+    if (asset) {
+      console.log('⚠️ ASSET EXIST ⚠️')
+      if (inputs.overwrite) {
+        console.log(`⛔ Deleting:`, name)
+        await api.deleteReleaseAsset(asset.id)
+      } else {
+        console.log(`▶️ Skipping:`, name)
+        continue
+      }
     }
-    if (inputs.files) {
-        console.log('inputs.files:', inputs.files)
-        files.push(...inputs.files.split('\n'))
+    console.log(`✅ Uploading:`, name)
+    const data = fs.readFileSync(file)
+    const result = await api.uploadReleaseAsset(release.id, name, data)
+    console.log(JSON.stringify(result, null, 2))
+    results.push(result)
+    core.endGroup() // Processing
+  }
+
+  console.log(`results.length:`, results.length)
+  if (!results.length) core.warning('No Assets Uploaded...')
+
+  // Outputs
+  core.info('📩 Setting Outputs')
+  core.setOutput('assets', JSON.stringify(results))
+
+  // Summary
+  if (inputs.summary) {
+    core.info('📝 Writing Job Summary')
+    try {
+      await addSummary(inputs, files, results)
+    } catch (e) {
+      console.log(e)
+      core.error(`Error writing Job Summary ${e.message}`)
     }
-    console.log('files.length:', files.length)
-    console.log('files:', files)
-    if (!files?.length) return core.setFailed('No Files to Process...')
+  }
 
-    // Names
-    console.log('inputs.names:', inputs.names)
-    const names = inputs.names ? inputs.names.split('\n') : []
-    console.log('names.length:', names.length)
-    console.log('names:', names)
-    if (names.length && names.length !== files.length) {
-        return core.setFailed('File and Names Length Mismatch...')
-    }
-
-    // Variables
-    console.log('context.repo:', github.context.repo)
-    console.log('context.ref:', github.context.ref)
-    console.log('context.payload.release?.id:', github.context.payload.release?.id)
-    const api = new Api(inputs.token)
-
-    // Release
-    const release = await getRelease(inputs, api)
-    console.log('release?.id:', release?.id)
-    if (!release) return core.setFailed('No Release to Process...')
-    console.log('release.html_url:', release.html_url)
-    console.log('release.assets.length:', release.assets.length)
-
-    const results = []
-
-    // Processing
-    core.info('Processing')
-    for (const file of files) {
-        let name
-        if (names.length) {
-            const i = files.indexOf(file)
-            name = names[i]
-        } else {
-            name = path.basename(file)
-        }
-        core.startGroup(`Processing: ${name}`)
-        core.info(`file: ${file}`)
-        const asset = release.assets.find((obj) => obj.name === name)
-        console.log(`asset.id:`, asset?.id)
-        if (asset) {
-            console.log('⚠️ ASSET EXIST ⚠️')
-            if (inputs.overwrite) {
-                console.log(`⛔ Deleting:`, name)
-                await api.deleteReleaseAsset(asset.id)
-            } else {
-                console.log(`▶️ Skipping:`, name)
-                continue
-            }
-        }
-        console.log(`✅ Uploading:`, name)
-        const data = fs.readFileSync(file)
-        const result = await api.uploadReleaseAsset(release.id, name, data)
-        console.log(JSON.stringify(result, null, 2))
-        results.push(result)
-        core.endGroup() // Processing
-    }
-
-    console.log(`results.length:`, results.length)
-    if (!results.length) core.warning('No Assets Uploaded...')
-
-    // Outputs
-    core.info('📩 Setting Outputs')
-    core.setOutput('assets', JSON.stringify(results))
-
-    // Summary
-    if (inputs.summary) {
-        core.info('📝 Writing Job Summary')
-        try {
-            await addSummary(inputs, files, results)
-        } catch (e) {
-            console.log(e)
-            core.error(`Error writing Job Summary ${e.message}`)
-        }
-    }
-
-    core.info(`✅ \u001b[32;1mFinished Success`)
+  core.info(`✅ \u001b[32;1mFinished Success`)
 }
 
 /**
@@ -137,23 +137,23 @@ async function main() /* NOSONAR */ {
  * @return {Promise<InstanceType<typeof github.GitHub>|undefined>}
  */
 async function getRelease(inputs, api) {
-    if (inputs.id) {
-        core.info(`Get Release by Input ID: \u001b[32m${inputs.id}`)
-        return await api.getRelease(inputs.id)
-    } else if (inputs.tag) {
-        core.info(`Get Release by Input TAG: \u001b[32m${inputs.tag}`)
-        return await api.getReleaseByTag(inputs.tag)
-    } else if (inputs.latest) {
-        core.info(`Get Latest Release: \u001b[32m${inputs.latest}`)
-        return await api.getLatestRelease()
-    } else if (github.context.payload.release?.id) {
-        core.info(`Get Release by ID: \u001b[32m${github.context.payload.release.id}`)
-        return await api.getRelease(github.context.payload.release?.id)
-    } else {
-        const tag = github.context.ref.replace('refs/tags/', '')
-        core.info(`Get Release by TAG: \u001b[32m${tag}`)
-        return await api.getReleaseByTag(tag)
-    }
+  if (inputs.id) {
+    core.info(`Get Release by Input ID: \u001b[32m${inputs.id}`)
+    return await api.getRelease(inputs.id)
+  } else if (inputs.tag) {
+    core.info(`Get Release by Input TAG: \u001b[32m${inputs.tag}`)
+    return await api.getReleaseByTag(inputs.tag)
+  } else if (inputs.latest) {
+    core.info(`Get Latest Release: \u001b[32m${inputs.latest}`)
+    return await api.getLatestRelease()
+  } else if (github.context.payload.release?.id) {
+    core.info(`Get Release by ID: \u001b[32m${github.context.payload.release.id}`)
+    return await api.getRelease(github.context.payload.release?.id)
+  } else {
+    const tag = github.context.ref.replace('refs/tags/', '')
+    core.info(`Get Release by TAG: \u001b[32m${tag}`)
+    return await api.getReleaseByTag(tag)
+  }
 }
 
 /**
@@ -164,32 +164,34 @@ async function getRelease(inputs, api) {
  * @return {Promise<void>}
  */
 async function addSummary(inputs, files, results) {
-    core.summary.addRaw('## Upload Release Action\n')
+  core.summary.addRaw('## Upload Release Action\n')
 
-    core.summary.addRaw('<details><summary>Files</summary>')
-    core.summary.addCodeBlock(files.join('\n'), 'text')
-    core.summary.addRaw('</details>\n')
+  core.summary.addRaw('<details><summary>Files</summary>')
+  core.summary.addCodeBlock(files.join('\n'), 'text')
+  core.summary.addRaw('</details>\n')
 
-    core.summary.addRaw('<details><summary>Results</summary>')
-    core.summary.addCodeBlock(JSON.stringify(results, null, 2), 'json')
-    core.summary.addRaw('</details>\n')
+  core.summary.addRaw('<details><summary>Results</summary>')
+  core.summary.addCodeBlock(JSON.stringify(results, null, 2), 'json')
+  core.summary.addRaw('</details>\n')
 
-    delete inputs.token
-    const yaml = Object.entries(inputs)
-        .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
-        .join('\n')
-    core.summary.addRaw('<details><summary>Inputs</summary>')
-    core.summary.addCodeBlock(yaml, 'yaml')
-    core.summary.addRaw('</details>\n')
+  delete inputs.token
+  const yaml = Object.entries(inputs)
+    .map(([k, v]) => `${k}: ${JSON.stringify(v)}`)
+    .join('\n')
+  core.summary.addRaw('<details><summary>Inputs</summary>')
+  core.summary.addCodeBlock(yaml, 'yaml')
+  core.summary.addRaw('</details>\n')
 
-    const text = 'View Documentation, Report Issues or Request Features'
-    const link = 'https://github.com/cssnr/upload-release-action'
-    core.summary.addRaw(`\n[${text}](${link}?tab=readme-ov-file#readme)\n\n---`)
-    await core.summary.write()
+  const text = 'View Documentation, Report Issues or Request Features'
+  const link = 'https://github.com/cssnr/upload-release-action'
+  core.summary.addRaw(`\n[${text}](${link}?tab=readme-ov-file#readme)\n\n---`)
+  await core.summary.write()
 }
 
-main().catch((e) => {
-    core.debug(e)
-    core.info(e.message)
-    core.setFailed(e.message)
-})
+try {
+  await main()
+} catch (e) {
+  core.debug(e)
+  core.info(e.message)
+  core.setFailed(e.message)
+}
